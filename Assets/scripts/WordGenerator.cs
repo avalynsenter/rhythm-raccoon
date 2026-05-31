@@ -1,21 +1,21 @@
 using UnityEngine;
-using UnityEngine.Tilemaps; // Required for Tilemap components
+using UnityEngine.InputSystem; 
 
-public class WordGenerator : MonoBehaviour
+public class WordSpawner : MonoBehaviour
 {
-    [Header("Spawn Zone")]
-    [Tooltip("Drag the Tilemap that represents the play area here.")]
-    public TilemapRenderer boardTilemap;
-    [Tooltip("Adds a little extra height above the tilemap so letters spawn just off-screen.")]
-    public float spawnHeightOffset = 1f;
+    [Header("Spawn Zone (Anchor Points)")]
+    [Tooltip("Drag the LeftBound empty GameObject here.")]
+    public Transform leftSpawnBound;
+    [Tooltip("Drag the RightBound empty GameObject here.")]
+    public Transform rightSpawnBound;
 
     [Header("Prefabs")]
     public GameObject[] spawnablePrefabs; 
 
     [Header("Difficulty: Timing & Speed")]
-    public float initialSpawnDelay = 3f;
-    public float minimumSpawnDelay = 1f;
-    public float delayDecreaseRate = 0.05f;
+    public float initialSpawnDelay = 4f; // Increased to slow down initial spawning
+    public float minimumSpawnDelay = 1.5f; 
+    public float delayDecreaseRate = 0.02f; // Slowed down the difficulty ramp
 
     public float initialFallSpeed = 2f;
     public float maxFallSpeed = 7f;
@@ -36,15 +36,15 @@ public class WordGenerator : MonoBehaviour
         currentSpawnDelay = initialSpawnDelay;
         currentFallSpeed = initialFallSpeed;
 
-        if (boardTilemap == null)
+        if (leftSpawnBound == null || rightSpawnBound == null)
         {
-            Debug.LogError("WordSpawner is missing a reference to the Tilemap!");
+            Debug.LogError("WordSpawner is missing its Left or Right spawn bounds!");
         }
     }
 
     void Update()
     {
-        if (boardTilemap == null) return; // Prevent errors if not assigned
+        if (leftSpawnBound == null || rightSpawnBound == null) return;
 
         gameTimer += Time.deltaTime;
         spawnTimer += Time.deltaTime;
@@ -64,17 +64,14 @@ public class WordGenerator : MonoBehaviour
         float progress = Mathf.Clamp01(gameTimer / timeToReachMaxLetters);
         int lettersToSpawn = Mathf.RoundToInt(Mathf.Lerp(minLettersPerWave, maxLettersLimit, progress));
 
-        // Get the absolute world boundaries of the Tilemap
-        Bounds mapBounds = boardTilemap.bounds;
-        float leftEdge = mapBounds.min.x;
-        float rightEdge = mapBounds.max.x;
-        
-        // Spawn slightly above the top edge of the tilemap
-        float spawnY = mapBounds.max.y + spawnHeightOffset; 
-
-        // Calculate horizontal spacing
+        // Use the exact X positions of your anchor points
+        float leftEdge = leftSpawnBound.position.x;
+        float rightEdge = rightSpawnBound.position.x;
         float availableWidth = rightEdge - leftEdge;
         float spacing = availableWidth / (lettersToSpawn + 1);
+        
+        // Use the exact Y position of your Left anchor point
+        float spawnY = leftSpawnBound.position.y; 
 
         for (int i = 0; i < lettersToSpawn; i++)
         {
@@ -89,6 +86,9 @@ public class WordGenerator : MonoBehaviour
             if (letterScript != null)
             {
                 letterScript.SetFallSpeed(currentFallSpeed);
+                
+                Key randomKey = (Key)Random.Range((int)Key.A, (int)Key.Z + 1);
+                letterScript.SetupRandomLetter(randomKey);
             }
         }
     }
