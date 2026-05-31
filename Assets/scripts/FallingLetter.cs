@@ -72,4 +72,9 @@ public class FallingLetter : MonoBehaviour
         // Disable the collider so it can't be hit again
         GetComponent<Collider2D>().enabled = false;
     }
+    
+    public void SetFallSpeed(float newSpeed)
+    {
+        fallSpeed = newSpeed;
+    }
 }
