@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem; // Import the new Input System namespace
+using TMPro;
 
 public class FallingLetter : MonoBehaviour
 {
@@ -8,6 +9,9 @@ public class FallingLetter : MonoBehaviour
     // Use the 'Key' enum from the new Input System.
     // You can now select keys like 'A', 'S', 'D', 'F', etc. in the Inspector.
     [SerializeField] private Key letterKey;
+    
+    [Header("Visuals")]
+    [SerializeField] private TMP_Text letterText;
 
     [Header("Movement Settings")]
     [SerializeField] private float fallSpeed = 2f;
@@ -76,5 +80,16 @@ public class FallingLetter : MonoBehaviour
     public void SetFallSpeed(float newSpeed)
     {
         fallSpeed = newSpeed;
+    }
+    
+    public void SetupRandomLetter(Key newKey)
+    {
+        letterKey = newKey;
+
+        // Update the visual text. Key.A.ToString() returns "A"
+        if (letterText != null)
+        {
+            letterText.text = newKey.ToString();
+        }
     }
 }
