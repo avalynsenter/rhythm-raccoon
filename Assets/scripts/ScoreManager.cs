@@ -71,8 +71,18 @@ public class ScoreManager : MonoBehaviour
         {
             GameObject hitLetter = innerZoneLetters[key][0];
             
-            Score += 2;
-            Debug.Log($"Perfect Hit! +2 points. Total Score: {Score}");
+            if (hitLetter.TryGetComponent<Powerup>(out Powerup powerupComponent))
+            {
+                // It has a powerup script! Trigger the effect.
+                powerupComponent.ApplyEffect();
+                Debug.Log("Powerup Collected!");
+            }
+            else
+            {
+                // It's a normal letter. Give normal points.
+                Score += 2;
+                Debug.Log($"Perfect Hit! +2 points. Total Score: {Score}");
+            }
 
             FallingLetter fallingLetter = hitLetter.GetComponent<FallingLetter>();
             if (fallingLetter != null)
@@ -89,8 +99,18 @@ public class ScoreManager : MonoBehaviour
         {
             GameObject hitLetter = outerZoneLetters[key][0];
             
-            Score += 1;
-            Debug.Log($"Good Hit! +1 point. Total Score: {Score}");
+            if (hitLetter.TryGetComponent<Powerup>(out Powerup powerupComponent))
+            {
+                // It has a powerup script! Trigger the effect.
+                powerupComponent.ApplyEffect();
+                Debug.Log("Powerup Collected!");
+            }
+            else
+            {
+                // It's a normal letter. Give normal points.
+                Score += 1;
+                Debug.Log($"Good Hit! +1 point. Total Score: {Score}");
+            }
 
             FallingLetter fallingLetter = hitLetter.GetComponent<FallingLetter>();
             if (fallingLetter != null)
