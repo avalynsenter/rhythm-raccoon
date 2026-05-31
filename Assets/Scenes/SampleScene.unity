@@ -1324,6 +1324,7 @@ MonoBehaviour:
   rightSpawnBound: {fileID: 1184398234}
   powerupPrefabs:
   - {fileID: 4159722400878317128, guid: eadcbfd4f530b44b7b987b4e0537d698, type: 3}
+  - {fileID: 4159722400878317128, guid: 39c744903caa44799bbc814b00c71d40, type: 3}
   spawnInterval: 15
   fallSpeed: 3
 --- !u!4 &1921254107
