@@ -8,6 +8,9 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class NetworkManager : MonoBehaviourPunCallbacks 
 {
+    [Header("Start Menu UI")]
+    public GameObject startPanel; // --- NEW: Holds Single Player & Multiplayer buttons ---
+
     [Header("Lobby UI Elements")]
     public GameObject lobbyPanel; 
     public Button createButton;
@@ -19,22 +22,45 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public Button readyButton;
     public TMP_Text waitingRoomText;
     public TMP_Text countdownText;
-    // --- NEW: Slot for the Ready Count Text ---
     public TMP_Text readyCountText; 
 
     private bool isReady = false;
 
     void Start()
     {
+        // 1. Show only the Start Menu when the game boots up
+        startPanel.SetActive(true);
+        lobbyPanel.SetActive(false);
+        waitingRoomPanel.SetActive(false);
+        
+        PhotonNetwork.AutomaticallySyncScene = true;
+    }
+
+    // --- NEW: START MENU BUTTON METHODS ---
+
+    public void OnSinglePlayerClicked()
+    {
+        // Disconnect from the internet just in case, turn on the fake local server, and create a fake room
+        if (PhotonNetwork.IsConnected) PhotonNetwork.Disconnect();
+        
+        PhotonNetwork.OfflineMode = true;
+        PhotonNetwork.CreateRoom("OfflineRoom"); 
+    }
+
+    public void OnMultiplayerClicked()
+    {
+        // Hide the Start Menu, show the Lobby, and connect to the internet
+        startPanel.SetActive(false);
+        lobbyPanel.SetActive(true);
+        
         createButton.interactable = false;
         joinButton.interactable = false;
-        waitingRoomPanel.SetActive(false); 
-        lobbyPanel.SetActive(true);
         statusText.text = "Connecting to Servers...";
-
-        PhotonNetwork.AutomaticallySyncScene = true;
+        
         PhotonNetwork.ConnectUsingSettings();
     }
+
+    // --- EXISTING LOBBY LOGIC ---
 
     public override void OnConnectedToMaster()
     {
@@ -62,28 +88,38 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         PhotonNetwork.JoinRoom("TypingArena");
     }
 
+    // --- UPDATED ROOM LOGIC ---
+
     public override void OnJoinedRoom()
     {
+        // --- NEW: If we are in Single Player, skip the waiting room and load instantly! ---
+        if (PhotonNetwork.OfflineMode)
+        {
+            PhotonNetwork.LoadLevel("GameScene");
+            return;
+        }
+
+        // Otherwise, do the normal Multiplayer Waiting Room stuff
         lobbyPanel.SetActive(false);
         waitingRoomPanel.SetActive(true);
         
         countdownText.text = "";
         SetPlayerReadyState(false);
         UpdateWaitingRoomText();
-        UpdateReadyCountUI(); // --- NEW: Update text on join ---
+        UpdateReadyCountUI(); 
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         UpdateWaitingRoomText();
-        UpdateReadyCountUI(); // --- NEW ---
+        UpdateReadyCountUI(); 
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         SetPlayerReadyState(false);
         UpdateWaitingRoomText();
-        UpdateReadyCountUI(); // --- NEW ---
+        UpdateReadyCountUI(); 
         countdownText.text = "Player left. Waiting...";
     }
 
@@ -107,7 +143,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         waitingRoomText.text = $"Players in Room: {playerCount} / 2";
     }
 
-    // --- NEW: Helper method to count ready players ---
     private void UpdateReadyCountUI()
     {
         if (readyCountText == null) return;
@@ -127,7 +162,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     {
         if (changedProps.ContainsKey("IsReady"))
         {
-            UpdateReadyCountUI(); // --- NEW: Update UI when someone clicks ready ---
+            UpdateReadyCountUI(); 
             CheckIfAllPlayersReady();
         }
     }
@@ -145,7 +180,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             }
         }
 
-        // --- UPDATED: Safer, cleaner RPC call ---
         photonView.RPC("StartCountdown_RPC", RpcTarget.All);
     }
 
