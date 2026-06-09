@@ -40,6 +40,11 @@ MonoBehaviour:
   - Fire
   - RespawnSpaceship
   - StartCountdown_RPC
+  - BuildPowerupLocally_RPC
+  - BuildWaveLocally_RPC
+  - ReceiveAttack_RPC
+  - ReceiveOpponentScore_RPC
+  - ReceiveOpponentStamina_RPC
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 0

@@ -90,6 +90,10 @@ public class ScoreManager : MonoBehaviour
         {
             StaminaManager.Instance.AddStamina(staminaRewardAmount);
         }
+        if (MultiplayerMatchManager.Instance != null)
+        {
+            MultiplayerMatchManager.Instance.SyncMyScore(this.Score);
+        }
     }
 
     public void ActivateMultiplier(int multiplier, float duration)
