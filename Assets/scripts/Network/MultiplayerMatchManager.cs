@@ -58,11 +58,24 @@ public class MultiplayerMatchManager : MonoBehaviourPun
         if (PhotonNetwork.OfflineMode || !PhotonNetwork.IsConnected) return;
         photonView.RPC("ReceiveAttack_RPC", RpcTarget.Others, attackName);
     }
-
+    
     [PunRPC]
     private void ReceiveAttack_RPC(string attackName)
     {
         Debug.Log($"Hit by attack: {attackName}");
-        // We will build out the punishments later!
+        
+        // 1. Visually show that WE got hit on our screen
+        if (AvatarController.Instance != null)
+        {
+            AvatarController.Instance.PlayLocalDamageEffect();
+        }
+
+        // 2. Actually apply the punishment
+        switch (attackName)
+        {
+            case "SpeedUp":
+                // Trigger logic here...
+                break;
+        }
     }
 }
