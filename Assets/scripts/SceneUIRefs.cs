@@ -2,49 +2,40 @@
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// A scene-specific singleton that holds references to all essential UI elements.
-/// This allows persistent managers to easily find them after a scene reload.
-/// </summary>
 public class SceneUIRefs : MonoBehaviour
 {
-    // --- NEW: Static instance for easy access ---
     public static SceneUIRefs Instance { get; private set; }
 
-    [Header("Scene UI References")]
-    // [SerializeField] private  Image staminaBarFill;
-    // [SerializeField] private   TMP_Text scoreText;
-    // [SerializeField] private   GameObject gameOverUI;
+    [Header("Inspector References")]
     [SerializeField] private Image inspectorStaminaBarFill;
     [SerializeField] private TMP_Text inspectorScoreText;
     [SerializeField] private GameObject inspectorGameOverUI;
+    // --- NEW: Inspector fields for Win/Loss screens ---
+    [SerializeField] private GameObject inspectorWinUI;
+    [SerializeField] private GameObject inspectorLoseUI;
 
-
-    public static Image staminaBarFill;
-    public static TMP_Text scoreText;
-    public static GameObject gameOverUI;
+    // --- Static properties for easy access ---
+    public static Image staminaBarFill { get; private set; }
+    public static TMP_Text scoreText { get; private set; }
+    public static GameObject gameOverUI { get; private set; }
+    // --- NEW: Static properties for Win/Loss screens ---
+    public static GameObject winUI { get; private set; }
+    public static GameObject loseUI { get; private set; }
 
     private void Awake()
     {
-        // This ensures there is only one instance in the scene.
-        // If another one exists, this new one destroys itself.
-        // if (Instance != null && Instance != this)
-        // {
-        //     Destroy(this.gameObject);
-        //     return;
-        // }
-        //
-        // Set the static instance to this object.
+        if (Instance != null && Instance != this)
+        {
+            Destroy(this.gameObject);
+            return;
+        }
         Instance = this;
+
+        // Map the inspector fields to the static properties
         staminaBarFill = inspectorStaminaBarFill;
         scoreText = inspectorScoreText;
         gameOverUI = inspectorGameOverUI;
-        
-        // DontDestroyOnLoad(this.gameObject);
+        winUI = inspectorWinUI;
+        loseUI = inspectorLoseUI;
     }
-
-    // public Image GetStaminaBarFill()
-    // {
-    //     return staminaBarFill;
-    // }
 }

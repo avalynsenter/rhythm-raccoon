@@ -1,7 +1,7 @@
 using UnityEngine;
 using Photon.Pun;
 using TMPro;
-using UnityEngine.UI; // Needed for the Image fill
+using UnityEngine.UI;
 
 public class MultiplayerMatchManager : MonoBehaviourPun
 {
@@ -9,7 +9,10 @@ public class MultiplayerMatchManager : MonoBehaviourPun
 
     [Header("Opponent UI")]
     public TMP_Text opponentScoreText;
-    public Image opponentStaminaBarFill; // Swapped to an Image to match your new system
+    public Image opponentStaminaBarFill;
+
+    private int currentOpponentScore = 0;
+    private int currentMyScore = 0;
 
     private void Awake()
     {
@@ -19,60 +22,70 @@ public class MultiplayerMatchManager : MonoBehaviourPun
     
     private void Start()
     {
-        // --- NEW: Hide opponent UI if playing Single Player ---
-        if (PhotonNetwork.OfflineMode || PhotonNetwork.CurrentRoom == null || PhotonNetwork.CurrentRoom.PlayerCount <= 1)
+        if (IsMultiplayerGame())
         {
-            if (opponentScoreText != null) opponentScoreText.gameObject.SetActive(false);
-            
-            // If your stamina bar is inside a background UI object, you might want to 
-            // disable its parent. But disabling the fill image directly works perfectly too!
-            if (opponentStaminaBarFill != null) 
+            // --- MULTIPLAYER ---
+            // Hide the opponent's stamina bar
+            if (opponentStaminaBarFill != null) opponentStaminaBarFill.transform.parent.gameObject.SetActive(false);
+        
+            // Hide your local stamina bar using our safe UI bridge!
+            if (SceneUIRefs.staminaBarFill != null) 
             {
-                // Disables the image itself (and its parent if you placed the Image component on the root of the bar)
-                opponentStaminaBarFill.transform.parent.gameObject.SetActive(false); 
+                SceneUIRefs.staminaBarFill.transform.parent.gameObject.SetActive(false);
             }
         }
+        else
+        {
+            // --- SINGLE PLAYER ---
+            // Hide the opponent's score and stamina
+            if (opponentScoreText != null) opponentScoreText.gameObject.SetActive(false);
+            if (opponentStaminaBarFill != null) opponentStaminaBarFill.transform.parent.gameObject.SetActive(false); 
+        }
+    }
+
+    /// <summary>
+    /// Checks if the current game is a multiplayer match.
+    /// </summary>
+    /// <returns>True if online and in a room with more than one player, false otherwise.</returns>
+    public bool IsMultiplayerGame()
+    {
+        return !PhotonNetwork.OfflineMode && PhotonNetwork.CurrentRoom != null && PhotonNetwork.CurrentRoom.PlayerCount > 1;
     }
 
     // --- SCORE SYNC ---
     public void SyncMyScore(int myTotalScore)
     {
-        if (PhotonNetwork.OfflineMode || !PhotonNetwork.IsConnected) return;
+        if (!IsMultiplayerGame()) return;
+        currentMyScore = myTotalScore;
         photonView.RPC("ReceiveOpponentScore_RPC", RpcTarget.Others, myTotalScore);
     }
 
     [PunRPC]
     private void ReceiveOpponentScore_RPC(int opponentScore)
     {
+        currentOpponentScore = opponentScore;
         if (opponentScoreText != null) 
         {
             opponentScoreText.text = $"Opponent: {opponentScore}";
         }
     }
 
-    // --- STAMINA SYNC ---
+    // --- STAMINA SYNC (No longer used, but kept for reference) ---
     public void SyncMyStamina(float currentStamina, float maxStamina)
     {
-        if (PhotonNetwork.OfflineMode || !PhotonNetwork.IsConnected) return;
-        
-        // We calculate the fraction (0.0 to 1.0) before sending it over the network
-        float fillFraction = currentStamina / maxStamina;
-        photonView.RPC("ReceiveOpponentStamina_RPC", RpcTarget.Others, fillFraction);
+        // This functionality is now disabled in multiplayer.
     }
 
     [PunRPC]
     private void ReceiveOpponentStamina_RPC(float opponentFillFraction)
     {
-        if (opponentStaminaBarFill != null) 
-        {
-            opponentStaminaBarFill.fillAmount = opponentFillFraction;
-        }
+        // This functionality is now disabled in multiplayer.
     }
 
     // --- ATTACK SYNC ---
     public void SendAttackToOpponent(string attackName)
     {
-        if (PhotonNetwork.OfflineMode || !PhotonNetwork.IsConnected) return;
+        if (!IsMultiplayerGame()) return;
         photonView.RPC("ReceiveAttack_RPC", RpcTarget.Others, attackName);
     }
     
@@ -89,11 +102,20 @@ public class MultiplayerMatchManager : MonoBehaviourPun
                 if (ScoreAndStaminaManager.Instance != null)
                     ScoreAndStaminaManager.Instance.ActivateScoreMultiplier(0.5f, 10f);
                 break;
-            // --- NEW: Catching the Stamina Attack ---
             case "HalveStamina":
-                if (ScoreAndStaminaManager.Instance != null)
-                    ScoreAndStaminaManager.Instance.ActivateStaminaMultiplier(0.5f, 10f);
+                // This attack is now effectively disabled as stamina is not used in multiplayer.
                 break;
         }
+    }
+
+    // --- Public Score Getters ---
+    public int GetOpponentScore()
+    {
+        return currentOpponentScore;
+    }
+
+    public int GetMyScore()
+    {
+        return currentMyScore;
     }
 }

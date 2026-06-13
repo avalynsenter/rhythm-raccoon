@@ -89,7 +89,6 @@ public class ScoreAndStaminaManager : MonoBehaviour
         Score += calculatedPoints;
         UpdateScoreUI();
         
-        // --- MULTIPLAYER HOOK: Broadcast Score ---
         if (MultiplayerMatchManager.Instance != null)
         {
             MultiplayerMatchManager.Instance.SyncMyScore(Score);
@@ -101,16 +100,16 @@ public class ScoreAndStaminaManager : MonoBehaviour
 
     public void AddStamina(float amount)
     {
+        // --- NEW: Disable stamina gain in multiplayer ---
+        if (MultiplayerMatchManager.Instance != null && MultiplayerMatchManager.Instance.IsMultiplayerGame())
+        {
+            return;
+        }
+
         if (currentStamina <= 0) return;
 
         currentStamina = Mathf.Clamp(currentStamina + amount, 0, maxStamina);
         UpdateStaminaUI();
-
-        // --- MULTIPLAYER HOOK: Broadcast Stamina on Gain ---
-        if (MultiplayerMatchManager.Instance != null)
-        {
-            MultiplayerMatchManager.Instance.SyncMyStamina(currentStamina, maxStamina);
-        }
     }
 
     public void ActivateScoreMultiplier(float multiplier, float duration)
@@ -127,16 +126,17 @@ public class ScoreAndStaminaManager : MonoBehaviour
 
     private IEnumerator DrainStamina()
     {
+        // --- NEW: Disable stamina drain in multiplayer ---
+        if (MultiplayerMatchManager.Instance != null && MultiplayerMatchManager.Instance.IsMultiplayerGame())
+        {
+            Debug.Log("Stamina drain disabled for multiplayer match.");
+            yield break; // Exit the coroutine immediately
+        }
+
         while (true)
         {
             currentStamina -= staminaDrainAmount;
             UpdateStaminaUI();
-
-            // --- MULTIPLAYER HOOK: Broadcast Stamina on Drain ---
-            if (MultiplayerMatchManager.Instance != null)
-            {
-                MultiplayerMatchManager.Instance.SyncMyStamina(currentStamina, maxStamina);
-            }
 
             if (currentStamina <= 0)
             {

@@ -5,9 +5,6 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    // This class no longer needs to hold a direct reference to the UI.
-    // It only needs to trigger the EndGame state.
-
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -19,21 +16,62 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(this.gameObject);
     }
 
+    // This is the original method for Single Player, left untouched.
     public void EndGame()
     {
         Debug.Log("Game Over!");
         Time.timeScale = 0f;
         
-        // Find the UI from the static reference and activate it.
-        if (SceneUIRefs.Instance != null && SceneUIRefs.gameOverUI != null)
+        if (SceneUIRefs.gameOverUI != null)
         {
             SceneUIRefs.gameOverUI.SetActive(true);
+        }
+    }
+    
+    /// <summary>
+    /// Ends the multiplayer match, determines win/loss, and displays the appropriate screen.
+    /// </summary>
+    public void EndGameMultiplayer()
+    {
+        Time.timeScale = 0f;
+
+        if (MultiplayerMatchManager.Instance != null)
+        {
+            int myScore = MultiplayerMatchManager.Instance.GetMyScore();
+            int opponentScore = MultiplayerMatchManager.Instance.GetOpponentScore();
+
+            // Determine the winner and show the correct screen using the SceneUIRefs bridge.
+            if (myScore >= opponentScore)
+            {
+                if (SceneUIRefs.winUI != null)
+                {
+                    SceneUIRefs.winUI.SetActive(true);
+                }
+            }
+            else
+            {
+                if (SceneUIRefs.loseUI != null)
+                {
+                    SceneUIRefs.loseUI.SetActive(true);
+                }
+            }
+        }
+        else
+        {
+            Debug.LogError("Cannot determine multiplayer winner: MultiplayerMatchManager not found.");
+            // As a fallback, you could show a generic game over screen
+            EndGame();
         }
     }
 
     public void RestartGame()
     {
         Time.timeScale = 1f;
+        // Ensure all UI is hidden before restart
+        if (SceneUIRefs.winUI != null) SceneUIRefs.winUI.SetActive(false);
+        if (SceneUIRefs.loseUI != null) SceneUIRefs.loseUI.SetActive(false);
+        if (SceneUIRefs.gameOverUI != null) SceneUIRefs.gameOverUI.SetActive(false);
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
