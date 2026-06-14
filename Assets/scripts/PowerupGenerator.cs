@@ -97,8 +97,8 @@ public class PowerupGenerator : MonoBehaviour
                 {
                     powerupComponent.ApplyEffect();
                 }
-
-                Destroy(powerupLetter.gameObject);
+                
+                powerupLetter.TriggerPopAndDestroy();
                 activePowerups.RemoveAt(i);
             }
         }

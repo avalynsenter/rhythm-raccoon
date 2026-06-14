@@ -115,7 +115,7 @@ public class WordGenerator : MonoBehaviour
                     {
                         powerup.ApplyEffect();
                     }
-                    Destroy(letter.gameObject);
+                    letter.TriggerPopAndDestroy();
                 }
 
                 activeWaves.RemoveAt(i);
