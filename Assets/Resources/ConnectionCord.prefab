@@ -155,3 +155,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49963afb9c5254193bfdbda2a852219b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LetterConnectionCord
+  pointsPerSegment: 20
+  sagAmount: 0.2
+  swayAmount: 0.2
+  swaySpeed: 2

@@ -907,7 +907,7 @@ MonoBehaviour:
   timeToReachMaxLetters: 180
   standardVerticalStagger: 1.5
   chordProbability: 0.2
-  connectionCordPrefab: {fileID: 0}
+  connectionCordPrefab: {fileID: 6039902528486513972, guid: 23ee081c4c93b492382885ef7f84d84f, type: 3}
   clusterProbability: 0.3
 --- !u!4 &415607409
 Transform:
