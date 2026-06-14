@@ -18,6 +18,9 @@ public class FallingLetter : MonoBehaviour
     [SerializeField] private float swaySpeed = 0.8f;       // How fast the wind pushes
     [SerializeField] private float maxRockAngle = 15f;     // NEVER flips! (Locks between -15 and 15 degrees)
     [SerializeField] private float rockSpeed = 1f;         // How fast it wobbles
+    
+    [Header("Effects")]
+    [SerializeField] private GameObject explosionPrefab;
 
     public bool inInnerZone { get; private set; } = false;
     public bool inOuterZone { get; private set; } = false;
@@ -163,6 +166,11 @@ public class FallingLetter : MonoBehaviour
             transform.localScale = Vector3.Lerp(popScale, Vector3.zero, timer / shrinkTime);
             timer += Time.deltaTime;
             yield return null;
+        }
+        
+        if (explosionPrefab != null)
+        {
+            Instantiate(explosionPrefab, transform.position, Quaternion.identity);
         }
 
         // 3. Actually destroy the object now that the animation is finished

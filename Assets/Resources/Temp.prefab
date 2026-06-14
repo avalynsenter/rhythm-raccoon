@@ -364,3 +364,8 @@ MonoBehaviour:
   letterKey: 0
   letterText: {fileID: 6866264109411719188}
   fallSpeed: 0.4
+  swayAmount: 0.5
+  swaySpeed: 0.8
+  maxRockAngle: 15
+  rockSpeed: 1
+  explosionPrefab: {fileID: 3568531759729945030, guid: d281e2fbdf28842f8ae463fd197b6cd2, type: 3}

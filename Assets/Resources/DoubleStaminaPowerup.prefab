@@ -5202,6 +5202,11 @@ MonoBehaviour:
   letterKey: 15
   letterText: {fileID: 4322878621582819765}
   fallSpeed: 1
+  swayAmount: 0.5
+  swaySpeed: 0.8
+  maxRockAngle: 15
+  rockSpeed: 1
+  explosionPrefab: {fileID: 3568531759729945030, guid: d281e2fbdf28842f8ae463fd197b6cd2, type: 3}
 --- !u!114 &1677271681535670815
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5215,5 +5220,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoubleStaminaGain
   powerupName: Double Stamina
+  target: 0
   staminaMultiplier: 2.5
   durationInSeconds: 10
