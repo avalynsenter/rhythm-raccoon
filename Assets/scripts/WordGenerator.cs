@@ -92,14 +92,21 @@ public class WordGenerator : MonoBehaviour
         CheckActiveWaves();
     }
 
-    // --- NEW: The Powerup Coroutine ---
-    public void TriggerSpeedAttack(float multiplier, float duration)
+    // --- UPDATED: The Powerup Coroutine ---
+    // Added 'string powerupName' so the UI knows what icon to show!
+    public void TriggerSpeedAttack(string powerupName, float multiplier, float duration)
     {
-        StartCoroutine(SpeedWarpRoutine(multiplier, duration));
+        StartCoroutine(SpeedWarpRoutine(powerupName, multiplier, duration));
     }
 
-    private IEnumerator SpeedWarpRoutine(float multiplier, float duration)
+    private IEnumerator SpeedWarpRoutine(string powerupName, float multiplier, float duration)
     {
+        // Tell the UI to start the clock!
+        if (PowerupUIManager.Instance != null)
+        {
+            PowerupUIManager.Instance.ActivateOrRefreshIcon(powerupName, duration);
+        }
+
         powerupSpeedMultiplier = multiplier; 
         yield return new WaitForSeconds(duration);
         powerupSpeedMultiplier = 1f; 

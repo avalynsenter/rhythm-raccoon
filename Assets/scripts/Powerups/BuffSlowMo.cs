@@ -19,7 +19,7 @@ public class BuffSlowMo : Powerup
         
         if (generator != null)
         {
-            generator.TriggerSpeedAttack(speedMultiplier, duration);
+            generator.TriggerSpeedAttack(powerupName, speedMultiplier, duration);
             Debug.Log($"Applied {powerupName}! Time slowed.");
         }
     }

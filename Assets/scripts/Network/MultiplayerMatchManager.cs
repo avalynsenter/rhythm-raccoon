@@ -107,7 +107,7 @@ public class MultiplayerMatchManager : MonoBehaviourPun
                 if (generator != null)
                 {
                     // The opponent hit us! Hardcode the punishment values here:
-                    generator.TriggerSpeedAttack(2.5f, 4f); 
+                    generator.TriggerSpeedAttack(attackName, 2.5f, 4f); 
                 }
                 break;
             case "HalveStamina":
